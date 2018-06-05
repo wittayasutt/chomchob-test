@@ -1,11 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { setCard } from '../../modules/card'
 
 const Container = styled.div`
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
 	border-bottom: 1px solid #eaeaea;
+
+	@media only screen and (max-width: 1088px) {
+		margin: 0 0.75rem !important;
+	}
 `
 
 const Tab = styled.ul`
@@ -25,6 +32,10 @@ const Menu = styled.li`
 	transition: 0.2s;
 	cursor: pointer;
 
+	${props => props.active && 'background: #22d0b2;'};
+	${props => props.active && 'color: #ffffff;'};
+	${props => props.active && 'border-color: #22d0b2;'};
+
 	:nth-child(1) {
 		border-radius: 4px 0 0 4px;
 	}
@@ -34,23 +45,30 @@ const Menu = styled.li`
 	}
 
 	:hover {
-		background: #22d0b2;
-		color: #ffffff;
-		border-color: #22d0b2;
+		${props =>
+			props.active ? 'background: #22d0b2;' : 'background: #eaeaea;'};
 	}
 `
 
 const Tabs = props => (
 	<Container className="container">
 		<Tab>
-			<Menu>
+			<Menu
+				active={props.card === 'grid'}
+				onClick={() => props.setCard('grid')}>
 				<i className="fas fa-th-large" aria-hidden="true" />
 			</Menu>
-			<Menu>
+			<Menu
+				active={props.card === 'list'}
+				onClick={() => props.setCard('list')}>
 				<i className="fas fa-list" aria-hidden="true" />
 			</Menu>
 		</Tab>
 	</Container>
 )
 
-export default Tabs
+const mapStateToProps = state => ({ card: state.card })
+
+const mapDispatchToProps = dispatch => bindActionCreators({ setCard }, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tabs)

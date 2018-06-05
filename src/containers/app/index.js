@@ -1,62 +1,54 @@
 import React, { Component } from 'react'
-import { Route /*Link*/ } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import styled from 'styled-components'
 import axios from 'axios'
 import config from '../../config'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setProduct } from '../../modules/product'
 
 import NavBar from '../navbar'
-import Tabs from '../tabs'
-import Grid from '../grid'
-import List from '../list'
+import Home from '../home'
+import Item from '../item'
 import Footer from '../footer'
 
-import Home from '../home'
-import About from '../about'
+const Wrapper = styled.div`
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+`
 
-const Wrapper = styled.div``
-
-const Container = styled.div`
-	clear: both;
+const Body = styled.div`
+	flex: 1;
 `
 
 class App extends Component {
-	constructor(props) {
-		super(props)
-
-		this.state = {
-			products: []
-		}
-	}
-
 	componentDidMount = () => {
 		axios
 			.get(`${config.api}/product`)
 			.then(res => {
-				this.setState({ products: res.data.list })
+				this.props.setProduct(res.data.list)
 				return res.data
 			})
 			.catch(err => console.log('err', err))
 	}
 
 	render() {
-		const { products } = this.state
-
 		return (
 			<Wrapper>
-				{/*<Link to="/">Home</Link>
-					<Link to="/about-us">About</Link>*/}
 				<NavBar />
-				<Tabs />
-				{/* <Grid products={products} /> */}
-				<List products={products} />
-				<Container className="container">
+				<Body>
 					<Route exact={true} path="/" component={Home} />
-					<Route exact={true} path="/about-us" component={About} />
-				</Container>
+					<Route exact={true} path="/item/:id" component={Item} />
+				</Body>
 				<Footer />
 			</Wrapper>
 		)
 	}
 }
 
-export default App
+const mapDispatchToProps = dispatch =>
+	bindActionCreators({ setProduct }, dispatch)
+
+export default withRouter(connect(null, mapDispatchToProps)(App))
